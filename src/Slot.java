@@ -3,8 +3,12 @@ import javafx.scene.shape.Circle;
 
 public class Slot extends Circle {
     public boolean isEmpty = true;
-    Slot() {
+    public int col;
+    public int row;
+    Slot(int c, int r) {
         super(50, Color.WHITE);
+        this.col = c;
+        this.row = r;
     }
 
     public void setIsEmpty(boolean isEmpty) {
