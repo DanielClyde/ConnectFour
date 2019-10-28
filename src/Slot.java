@@ -11,7 +11,4 @@ public class Slot extends Circle {
         this.row = r;
     }
 
-    public void setIsEmpty(boolean isEmpty) {
-        this.isEmpty = isEmpty;
-    }
 }
