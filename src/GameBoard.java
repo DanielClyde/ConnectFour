@@ -1,21 +1,25 @@
+import javafx.animation.FadeTransition;
 import javafx.animation.PathTransition;
-import javafx.event.EventHandler;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
-import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.effect.Effect;
+import javafx.scene.effect.Glow;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
-import java.util.ArrayList;
 
 public class GameBoard extends GridPane {
     public Slot[][] slots;
-    public boolean playerOneTurn = true;
+    public SimpleBooleanProperty playerOneTurn = new SimpleBooleanProperty(true);
     public Pane chipPane;
+    public Pane winPane;
+    public Color winner;
 
     GameBoard() {
         BackgroundFill fill = new BackgroundFill(Color.GOLD, CornerRadii.EMPTY, Insets.EMPTY);
@@ -27,6 +31,8 @@ public class GameBoard extends GridPane {
         this.chipPane.setMinWidth(this.getWidth());
         this.chipPane.setMinHeight(this.getHeight());
         this.chipPane.setPickOnBounds(false);
+        this.winPane = new Pane();
+        this.winPane.setPickOnBounds(false);
         this.slots = new Slot[7][5];
         this.initializeSlots();
     }
@@ -41,11 +47,12 @@ public class GameBoard extends GridPane {
                     if (s.isEmpty) {
                         Slot availableSlot = this.findLowestAvailableSlot(s);
 
-                        Color fill = playerOneTurn ? Color.RED : Color.BLUE;
+                        Color fill = playerOneTurn.getValue() ? Color.RED : Color.BLUE;
                         this.dropChip(availableSlot, fill);
                         availableSlot.isEmpty = false;
-                        this.checkForWinner();
-                        this.playerOneTurn = !playerOneTurn;
+                        availableSlot.fill = fill;
+                        this.checkForWinner(availableSlot);
+                        this.playerOneTurn.set(!playerOneTurn.getValue());
                     } else {
                         System.out.println("Can't go there!");
                     }
@@ -96,7 +103,110 @@ public class GameBoard extends GridPane {
         }
     }
 
-    public void checkForWinner() {
+    public void checkForWinner(Slot slot) {
+        // vertical
+        Slot[] colOfSlots = this.slots[slot.col];
+        int count = 0;
+        for(Slot s : colOfSlots) {
+            if (s.fill == slot.fill) {
+                count++;
+            } else {
+                count = 0;
+            }
+            if (count >= 4) {
+                System.out.println("winner!");
+                this.winner = slot.fill;
+                this.showWinPane();
+            }
+        }
+
+        // horizontal
+        count = 0;
+        for (Slot[] slotCol : this.slots) {
+            for (Slot s : slotCol) {
+                if (s.row == slot.row) {
+                    if (s.fill == slot.fill) {
+                        count++;
+                    } else {
+                        count = 0;
+                    }
+                    if (count >= 4) {
+                        System.out.println("Winner!");
+                        this.winner = slot.fill;
+                        this.showWinPane();
+                    }
+                }
+            }
+        }
+
+        //diagonal
+        this.checkDiagonal(slot);
+    }
+
+    public void checkDiagonal(Slot slot) {
+        int sum = 1;
+        try {
+            Slot temp = this.slots[slot.col + 1][slot.row + 1];
+            while (temp.fill == slot.fill) {
+                sum++;
+                this.checkSum(sum, slot);
+                temp = this.slots[temp.col + 1][temp.row + 1];
+            }
+            temp = this.slots[slot.col - 1][slot.row - 1];
+            while (temp.fill == slot.fill) {
+                sum++;
+                this.checkSum(sum, slot);
+                temp = this.slots[temp.col - 1][temp.row - 1];
+            }
+            sum = 1;
+            temp = this.slots[slot.col - 1][slot.row + 1];
+            while (temp.fill == slot.fill) {
+                sum++;
+                this.checkSum(sum, slot);
+                temp = this.slots[temp.col - 1][temp.row + 1];
+            }
+            temp = this.slots[slot.col + 1][slot.row - 1];
+            while (temp.fill == slot.fill) {
+                sum++;
+                this.checkSum(sum, slot);
+                temp = this.slots[temp.col + 1][temp.row - 1];
+            }
+        } catch (Exception ex) {
+
+        }
+    }
+
+    public void checkSum(int sum, Slot s) {
+        if(sum >= 4) {
+            this.winner = s.fill;
+            System.out.println("Diagonal Winner!");
+            this.showWinPane();
+        }
+    }
+
+    private void showWinPane() {
+        String winningText = this.winner == Color.RED ? "Red Wins!" : this.winner == Color.BLUE ? "Blue Wins!" : "TIE";
+        Text txt = new Text(winningText);
+        txt.setFont(new Font(150));
+        txt.setFill(this.winner);
+        txt.setStroke(Color.BLACK);
+        txt.setRotate(-25);
+        txt.setTextAlignment(TextAlignment.CENTER);
+        txt.setX(this.chipPane.getWidth() / 5 - 50);
+        txt.setY(this.chipPane.getHeight() / 2);
+        Effect glow = new Glow(5);
+        txt.setEffect(glow);
+
+        this.winPane.getChildren().add(txt);
+        this.winPane.setPickOnBounds(true);
+        FadeTransition fade = new FadeTransition();
+        fade.setNode(txt);
+        fade.setAutoReverse(true);
+        fade.setCycleCount(10);
+        fade.setDuration(Duration.millis(2000));
+        fade.setToValue(0.1);
+        fade.setFromValue(0.99);
+        fade.play();
 
     }
 }

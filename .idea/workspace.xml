@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4d87a90f-8dd1-4784-b26c-0557045aa3eb" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/ConnectFour/ConnectFour.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ConnectFour/ConnectFour.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/ConnectFour/GameBoard.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ConnectFour/GameBoard.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/ConnectFour/Slot.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ConnectFour/Slot.class" afterDir="false" />
